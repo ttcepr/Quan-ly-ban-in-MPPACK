@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Print Manager Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f3f4f6;
+      }
+      
+      /* Default screen state: hide the specialized print overlay */
+      .print-area {
+        display: none;
+      }
+
+      @media print {
+        /* Hide everything by default */
+        body > * {
+          display: none !important;
+        }
+        
+        /* Show the root, but hide its flex/app structure children */
+        body > #root {
+          display: block !important;
+        }
+        
+        #root > .flex {
+          display: block !important; /* Reset the main flex container */
+        }
+
+        /* Hide Sidebar and Main Content specifically */
+        nav, aside, main, .no-print {
+          display: none !important;
+        }
+
+        /* Show the print area */
+        .print-area {
+          display: block !important;
+          width: 100%;
+          height: auto;
+          position: absolute;
+          top: 0;
+          left: 0;
+          background: white;
+          padding: 0;
+          margin: 0;
+        }
+
+        /* Reset backgrounds */
+        body, html, #root {
+          background-color: white !important;
+          height: auto !important;
+          overflow: visible !important;
+        }
+
+        /* Ensure page breaks work */
+        .page-break-inside-avoid {
+          break-inside: avoid;
+        }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
