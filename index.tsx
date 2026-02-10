@@ -194,6 +194,12 @@ const App = () => {
     if (t.includes('đen') || t.includes('black')) return 'text-black';
     return 'text-gray-900';
   };
+  
+  const formatShelf = (shelf: string) => {
+    if (!shelf) return '';
+    // Extract numbers only (e.g., "A-01" -> "01")
+    return shelf.replace(/[^0-9]/g, '');
+  };
 
   // --- Actions ---
   const handleSaveOrder = (e: React.FormEvent) => {
@@ -428,7 +434,7 @@ const App = () => {
   );
 
   // --- RENDER: SHEET TICKET LAYOUT ---
-  const renderSheetTicket = (order: Order, colorNum: number, isHidden: boolean) => {
+  const renderSheetTicket = (order: Order, colorNum: number, isHidden: boolean, queueIndex: number) => {
     const key = `${order.id}-${colorNum}`;
     const colorName = getColorName(order, colorNum);
     const colorClass = getColorStyle(colorName);
@@ -440,7 +446,7 @@ const App = () => {
             <tbody>
               <tr>
                 <td rowSpan={2} className="border border-black text-center text-6xl font-black w-20 p-0 bg-white leading-none">
-                  {colorNum}
+                  {queueIndex}
                 </td>
                 <td className="border border-black bg-orange-200 font-bold p-1 text-[10px] w-24 uppercase text-center align-middle">KHÁCH HÀNG</td>
                 <td className="border border-black font-bold p-1 text-center text-lg align-middle">{order.customer}</td>
@@ -450,19 +456,18 @@ const App = () => {
                 <td className="border border-black bg-blue-500 text-white font-black p-1 text-center text-xl w-16 align-middle">{order.colors}</td>
                 <td className="border border-black bg-orange-200 font-bold p-1 text-[10px] w-24 uppercase text-center align-middle">NGÀY NHẬP</td>
                 <td className="border border-black font-bold p-1 text-center text-base align-middle">{order.dateInput || '...'}</td>
-                <td className="border border-black bg-orange-200 font-bold p-1 text-[10px] w-20 uppercase text-center align-middle">THỨ TỰ</td>
-                <td className="border border-black font-bold p-1 text-center w-12 align-middle">1</td>
+                <td colSpan={2} className="border border-black bg-orange-200 font-bold p-1 text-[10px] w-20 uppercase text-center align-middle">THỨ TỰ</td>
               </tr>
               <tr>
                 <td className="border border-black bg-orange-200 font-bold p-1 text-[10px] uppercase text-center align-middle">MÃ CODE</td>
                 <td colSpan={3} className="border border-black font-black p-1 text-center text-2xl align-middle">{order.code}</td>
                 <td className="border border-black bg-orange-200 font-bold p-1 text-[10px] uppercase text-center align-middle">ĐƠN VỊ</td>
-                <td className="border border-black font-black p-1 text-center text-red-600 text-2xl align-middle">{colorNum}</td>
+                <td className="border border-black font-black p-1 text-center text-red-600 text-7xl align-middle">{colorNum}</td>
                 <td className="border border-black bg-orange-200 font-bold p-1 text-[10px] uppercase text-center align-middle">MÀU IN</td>
                 <td className={`border border-black font-black p-1 text-center ${colorClass} text-xl uppercase align-middle whitespace-nowrap overflow-hidden`}>
                   {colorName}
                 </td>
-                <td colSpan={2} className="border border-black font-black p-1 text-center text-2xl align-middle">1</td>
+                <td colSpan={2} className="border border-black font-black p-1 text-center text-2xl align-middle">{formatShelf(order.shelf) || '1'}</td>
               </tr>
               <tr>
                 <td className="border border-black bg-orange-200 font-bold p-2 text-xs uppercase text-center align-middle">TÊN SẢN PHẨM</td>
@@ -834,7 +839,7 @@ const App = () => {
 
         {/* --- GRID OF TICKETS --- */}
         <div className="flex flex-col items-center">
-          {printQueue.map((order) => {
+          {printQueue.map((order, index) => {
             // For Roll (In Cuộn), we only print 1 ticket regardless of color count.
             // For Sheet (In Tờ), we print N tickets where N = colors.
             const tickets = order.type === 'roll' 
@@ -853,7 +858,7 @@ const App = () => {
                    
                    // Check order type to render correct ticket
                    if (order.type === 'sheet') {
-                      return renderSheetTicket(order, colorNum, isHidden);
+                      return renderSheetTicket(order, colorNum, isHidden, index + 1);
                    } else {
                       return renderRollTicket(order, colorNum, isHidden);
                    }
